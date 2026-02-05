@@ -7,3 +7,9 @@ I help businesses gain clarity of their operations by building systems that keep
 ### RAG Telegram Chatbot
 ### Customer Support Agent
 ### Employee Onborading Agent
+## Why Work With Me
+## Let's Connect
+## Let's Work Together
+## Technical Skill Demostrated
+## Getting Started
+## Portfolio Metric
