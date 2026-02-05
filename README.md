@@ -5,8 +5,10 @@ Automation workflow that is ready for production, transforming backend chaos int
 I help businesses gain clarity of their operations by building systems that keep them organised, profitable, and scalable. My goal is help eliminate maunal and daunting business workflow by building simple and effective automation system that replace the existing chaos with clarity.
 ## Workflow I Build
 ### RAG Telegram Chatbot
+### RAG Pipeline & Chatbot
 ### Customer Support Agent
 ### Employee Onborading Agent
+### Lead Generation Agent
 ## Why Work With Me
 ## Let's Connect
 ## Let's Work Together
