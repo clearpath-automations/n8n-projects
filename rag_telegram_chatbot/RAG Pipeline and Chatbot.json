@@ -1,0 +1,331 @@
+{
+  "name": "RAG Pipeline and Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1iJSo-hEp9v1RkclEMZo706bzXSkZ_6nV",
+          "mode": "list",
+          "cachedResultName": "ClearPath_n8n",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1424,
+        -336
+      ],
+      "id": "65846908-2cdf-44e0-b922-fa6240c7d8e7",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_API_KEY_HERE",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1216,
+        -336
+      ],
+      "id": "26b92ae8-29f9-444e-9110-0c4275764760",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "clearpath-sop",
+          "mode": "list",
+          "cachedResultName": "clearpath-sop"
+        },
+        "options": {
+          "clearNamespace": false,
+          "pineconeNamespace": "SOP"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -1008,
+        -336
+      ],
+      "id": "743b39f9-6d92-459c-80e8-f7398e356ec6",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "eJ7dvPR4E1i5CPw9",
+          "name": "ClearPath_VS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1104,
+        -160
+      ],
+      "id": "c937b445-f05e-4cb7-8240-a92c809dcd2d",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "igF9FBpfyZWpXdNP",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -896,
+        -160
+      ],
+      "id": "1d0e009b-eef9-4ed3-a26f-3d0b6467eaa8",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a knowledge-based assistant for a company.\nYour sole responsibility is to answer employee and client inquiries using only the approved knowledge base provided via the Pinecone tool.\n\n## Core Rules (Must Be Followed at All Times)\n\nYou must always query the Pinecone knowledge base tool before answering any question.\n\nYou are strictly forbidden from answering based on prior knowledge, assumptions, general experience, or reasoning outside the retrieved content.\n\nIf the information is not found explicitly in the knowledge base results, you must not attempt to infer, guess, summarize from memory, or fabricate an answer.\n\nYour response must be grounded only in the content returned from the Pinecone tool.\n\nThere are no exceptions to these rules.\n\n## Answering Behavior\n\nUse the Pinecone tool to retrieve relevant SOP content for every user query.\n\nBase your response only on the retrieved passages.\n\nIf multiple relevant passages exist, combine them carefully without adding new information.\n\nDo not introduce opinions, recommendations, or interpretations beyond what is stated in the SOP.\n\n## Missing or Insufficient Information\n\nIf the Pinecone knowledge base does not contain the answer, or the retrieved information is unclear or incomplete, respond with exactly this message (and nothing else):\n\n“I don’t have that information in the company SOP. Please contact support for further assistance.”\n\nDo not ask follow-up questions.\nDo not suggest possible answers.\nDo not continue the conversation beyond this response.\n\n## Tone & Style\n\nNeutral and professional\n\nClear, concise, and factual\n\nNo conversational filler\n\nNo speculation\n\nNo references to being an AI or language model\n\n## Tool Usage Requirement\n\nThe Pinecone knowledge base tool is the single source of truth.\n\nEvery answer must be preceded by a successful knowledge base lookup.\n\nIf the tool is unavailable or returns no relevant data, follow the Missing or Insufficient Information rule above.\n\n## Summary Directive\n\nIf it is not in the SOP, you do not know it.\nIf you did not retrieve it from Pinecone, you cannot say it."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        -336
+      ],
+      "id": "78df2f77-6055-415b-9197-10bb96334dab",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        -336
+      ],
+      "id": "3793013a-d190-4e00-8f91-6802f04bc44c",
+      "name": "When chat message received",
+      "webhookId": "042a9985-ce54-43fc-b107-e06d538277ab"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        -176
+      ],
+      "id": "79f3bbb4-3838-4eac-b05b-0f7cd4330b93",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_API_KEY_HERE",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "call this tool to access the SOP database",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "clearpath-sop",
+          "mode": "list",
+          "cachedResultName": "clearpath-sop"
+        },
+        "options": {
+          "pineconeNamespace": "SOP"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        -144
+      ],
+      "id": "1f356d99-72ed-4ed3-b850-80b327ec3fb6",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "YOUR_API_KEY_HERE",
+          "name": "ClearPath_VS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "c84c8a63-f641-490e-9db5-3e12f3ffeb10",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_API_KEY_HERE",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "69085448-ed9c-4f06-81a7-f705253b267a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6c41e44a058cec42ebae9f1df3fb07debb3c6dee5933caf97cb61d2f7346c6c4"
+  },
+  "id": "B97HjpcCbrXFiuLi",
+  "tags": []
+}
