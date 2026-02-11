@@ -34,10 +34,10 @@ I help businesses gain clarity of their operations by building systems that keep
 
 ## Let's Connect
 
-LinkedIn: www.linkedin.com/in/oluyinka-odewole
-Email: info@clearpathconsulting.xyz
-Twitter/X: @ooluyinkah
-GitHub:clearpath-automations
+- LinkedIn: www.linkedin.com/in/oluyinka-odewole
+- Email: info@clearpathconsulting.xyz
+- Twitter/X: @ooluyinkah
+- GitHub:clearpath-automations
 
 ## Let's Work Together
 
@@ -65,13 +65,20 @@ Each project folder contains:
 - Customization instructions
 - Troubleshooting guides
 
-Implementation Process
+Implementation Process:
+
 Step 1: Import the workflow JSON into your n8n instance
+
 Step 2: Configure credentials for integrated services
+
 Step 3: Update IDs (database, sheets, API endpoints)
+
 Step 4: Customize for your specific use case
+
 Step 5: Test with sample data
+
 Step 6: Deploy to production
+
 Step 7: Monitor and optimize
 
 ## Portfolio Metric
