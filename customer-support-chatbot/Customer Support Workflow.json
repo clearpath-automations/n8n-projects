@@ -1,0 +1,1451 @@
+{
+  "name": "Customer Support Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -5440,
+        -320
+      ],
+      "id": "10b4b6f6-89a9-4a99-aa0c-b3aa85c91b19",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Your_ID_Here",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "=Billing & Subscription",
+              "description": "All emails related to payments, invoices, refunds, failed transactions, subscription upgrades/downgrades, cancellations, pricing questions, or plan changes.  Includes:  “I was charged twice”  “Please cancel my subscription”  “My payment failed”  “How much is the Pro plan?”  Refund requests"
+            },
+            {
+              "category": "=Technical Support",
+              "description": "Any issue involving system errors, bugs, features not working, login problems, integrations failing, performance issues, or unexpected behavior.  Includes:  Platform errors  Broken features  Login/account access problems  “It’s not working”  API/integration failures"
+            },
+            {
+              "category": "=Product & Usage Questions",
+              "description": "General how-to questions, onboarding help, clarification about features, documentation guidance, or best practices.  Includes:  “How do I export data?”  “Where can I find…?”  “How does this feature work?”  Setup guidance"
+            },
+            {
+              "category": "=Sales & Partnerships",
+              "description": "Pre-sales questions, demo requests, enterprise inquiries, bulk pricing, affiliate requests, or partnership proposals.  Includes:  “Can I get a demo?”  Enterprise pricing  Agency partnerships  Reseller inquiries"
+            },
+            {
+              "category": "Complaints & Security Concerns",
+              "description": "Customer dissatisfaction, escalations, negative feedback, privacy issues, suspicious activity, or data/security-related concerns.  Includes:  “I’m very disappointed”  Data breach concerns  Unauthorized login alerts  GDPR/data deletion requests"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=You are an email classification assistant.\n\nClassify the following customer email into one of these categories:\n\n1. Billing & Subscription\n2. Technical Support\n3. Product & Usage Questions\n4. Sales & Partnerships\n5. Complaints & Security Concerns\n\nRespond with only one category name exactly as written above.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -5216,
+        -320
+      ],
+      "id": "8e5e4071-91cc-43db-aaec-e6fe74715585",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -5152,
+        0
+      ],
+      "id": "2f92760e-aa68-4e11-b50f-6348ea351d50",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxx",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_9015610760546277394"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4640,
+        64
+      ],
+      "id": "fece9df2-3791-4637-a834-559b28234d77",
+      "name": "Complaints & Security Concerns",
+      "webhookId": "9f4ac701-c66e-402c-bc3d-b4a99017cb23",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.threadId }}",
+        "labelIds": [
+          "Label_2802479357789986851"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4640,
+        -128
+      ],
+      "id": "3cee73e3-9a66-499b-8ac7-4c24a9c0840f",
+      "name": "Sales & Partnerships",
+      "webhookId": "9f4ac701-c66e-402c-bc3d-b4a99017cb23",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_2455583513663846160"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4640,
+        -320
+      ],
+      "id": "bb3e32bb-16e5-4fa2-b8cc-424203d6d5da",
+      "name": "Product & Usage Questions",
+      "webhookId": "9f4ac701-c66e-402c-bc3d-b4a99017cb23",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_8619334336879316026"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4640,
+        -512
+      ],
+      "id": "7e3424ae-e6a8-4b06-a3cd-181eab661340",
+      "name": "Technical Support",
+      "webhookId": "9f4ac701-c66e-402c-bc3d-b4a99017cb23",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_8940458516101485518"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4640,
+        -704
+      ],
+      "id": "7e0db7aa-a7b6-4850-af76-d0c4afa8d9ff",
+      "name": "Billing & Subscription",
+      "webhookId": "9f4ac701-c66e-402c-bc3d-b4a99017cb23",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3616,
+        -368
+      ],
+      "id": "c689b112-2e78-4abb-99fc-01b1971262c7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9c1945b-008d-487f-b4d8-6562191fe4cd",
+              "name": "Category",
+              "value": "Complaint & Security Concerns",
+              "type": "string"
+            },
+            {
+              "id": "e256bcdb-138b-47ff-b16c-2c9c4b8a6813",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "39cca73c-f391-41d1-a875-9bd8b4bfee03",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4864,
+        64
+      ],
+      "id": "487aab23-3228-446d-adc5-cd32e1293f77",
+      "name": "CSC category"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9c1945b-008d-487f-b4d8-6562191fe4cd",
+              "name": "Category",
+              "value": "Sales & Partnership",
+              "type": "string"
+            },
+            {
+              "id": "439b2e8c-0d22-4d4d-8297-e39de4cf6ba2",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "d0aaf6c4-9d1a-4970-b43d-1aa368ef2903",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4864,
+        -128
+      ],
+      "id": "392e42cb-56a8-4ed5-b990-77cff44d5533",
+      "name": "S&P category"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9c1945b-008d-487f-b4d8-6562191fe4cd",
+              "name": "Category",
+              "value": "Product & Usage Issues",
+              "type": "string"
+            },
+            {
+              "id": "de7e2089-895b-4eab-8b65-cce03b04fe44",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "41d3dd04-c112-4b30-9c89-4d59f50ac833",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4864,
+        -320
+      ],
+      "id": "ccc486c7-d356-46df-9334-4d9e1887ef64",
+      "name": "PUC category"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9c1945b-008d-487f-b4d8-6562191fe4cd",
+              "name": "Category",
+              "value": "Technical Support",
+              "type": "string"
+            },
+            {
+              "id": "6d0e2525-d3d4-4a46-bb61-0252069497be",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "34c51b5b-6357-4974-87c9-b6c6a9aecf58",
+              "name": "EmailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4864,
+        -512
+      ],
+      "id": "d20c6a31-d61e-4197-9e27-987b9c532a39",
+      "name": "TS Category"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9c1945b-008d-487f-b4d8-6562191fe4cd",
+              "name": "Category",
+              "value": "Billing & Subscription",
+              "type": "string"
+            },
+            {
+              "id": "d1ee0346-f6e7-4e2d-bfac-792a37d41f1c",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "b90ef0e2-b1a6-4164-870c-4c2b7580782d",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ee7be916-2aa5-4580-893e-9a01c8982b39",
+              "name": "Originaltext",
+              "value": "={{$json.snippet}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4864,
+        -704
+      ],
+      "id": "ca57e565-0e2e-4cda-a344-21044907ff1f",
+      "name": "B&S category"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a professional Customer Support Assistant.\n\nYour task is to generate a clear, polite, and professional draft response to a customer email related to billing or subscription matters.\n\nHere is the email you are responding to:\n{{ $('Gmail Trigger').item.json.text }}\n\nGuidelines:\n- Be helpful and concise.\n- Maintain a professional tone.\n- Do not invent specific policies, pricing, or guarantees.\n- If necessary, politely ask for clarification.\n- Do not mention internal processes.\n- Do not wrap the response in markdown.\n- Sign off the email with Elon.\n\nReturn the response in the required JSON format."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "customer_support_reply",
+              "schema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"Subject\": {\n      \"type\": \"string\"\n    },\n    \"Message\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"Subject\", \"Message\"]\n}\n",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -4416,
+        -704
+      ],
+      "id": "a9ec88bb-9d24-4785-9232-0e42ed921a8d",
+      "name": "Draft B&S Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxx",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a professional Technical Support Assistant.\n\nYour task is to generate a clear, structured, and helpful response to a customer experiencing a technical issue. \n\nIf troubleshooting steps are appropriate, include them clearly.\n\nHere is the email you are responding to:\n{{ $('Gmail Trigger').item.json.text }}\n\nGuidelines:\n- Be helpful and concise.\n- Maintain a professional tone.\n- Do not invent specific policies, pricing, or guarantees.\n- If necessary, politely ask for clarification.\n- Do not mention internal processes.\n- Do not wrap the response in markdown.\n- Sign off the email with Elon.\n\nReturn the response in the required JSON format."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "customer_support_reply",
+              "schema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"Subject\": {\n      \"type\": \"string\"\n    },\n    \"Message\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"Subject\", \"Message\"]\n}\n",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -4416,
+        -512
+      ],
+      "id": "9647c50f-75e1-49b7-b2ba-7dbde3660884",
+      "name": "Draft TS Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxx",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a professional Customer Support Assistant.\n\nYour task is to generate a helpful, educational, and easy-to-follow response to a customer asking about how to use a feature.\n\nHere is the email you are responding to:\n{{ $('Gmail Trigger').item.json.text }}\n\nGuidelines:\n- Be helpful and concise.\n- Maintain a professional tone.\n- Do not invent specific policies, pricing, or guarantees.\n- If necessary, politely ask for clarification.\n- Do not mention internal processes.\n- Do not wrap the response in markdown.\n- Sign off the email with Elon.\n\nReturn the response in the required JSON format."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "customer_support_reply",
+              "schema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"Subject\": {\n      \"type\": \"string\"\n    },\n    \"Message\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"Subject\", \"Message\"]\n}\n",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -4416,
+        -320
+      ],
+      "id": "d817b4d6-7cfc-4c43-a652-282c0456c992",
+      "name": "Draft PUC Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxx",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a professional Sales Support Representative.\n\nYour task is to generate a professional and engaging response to a sales or partnership inquiry.\n\nHere is the email you are responding to:\n{{ $('Gmail Trigger').item.json.text }}\n\nGuidelines:\n- Be helpful and concise.\n- Maintain a professional tone.\n- Do not invent specific policies, pricing, or guarantees.\n- If necessary, politely ask for clarification.\n- Do not mention internal processes.\n- Do not wrap the response in markdown.\n- Sign off the email with Elon.\n\nReturn the response in the required JSON format."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "customer_support_reply",
+              "schema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"Subject\": {\n      \"type\": \"string\"\n    },\n    \"Message\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"Subject\", \"Message\"]\n}\n",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -4416,
+        -128
+      ],
+      "id": "22970ab2-c1cc-4f5a-a7cb-1b241b42b92d",
+      "name": "Draft S&P Reply",
+      "alwaysOutputData": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxx",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a professional Senior Customer Support Specialist.\n\nYour task is to generate a calm, empathetic, and reassuring response to a customer complaint or security-related concern.\n\nPrioritize empathy and clarity.\n\nHere is the email you are responding to:\n{{ $('Gmail Trigger').item.json.text }}\n\nGuidelines:\n- Be helpful and concise.\n- Maintain a professional tone.\n- Do not invent specific policies, pricing, or guarantees.\n- If necessary, politely ask for clarification.\n- Do not mention internal processes.\n- Do not wrap the response in markdown.\n- Sign off the email with Elon.\n\nReturn the response in the required JSON format."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "customer_support_reply",
+              "schema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"Subject\": {\n      \"type\": \"string\"\n    },\n    \"Message\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"Subject\", \"Message\"]\n}\n",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -4416,
+        64
+      ],
+      "id": "f8f459cf-2fba-4a7c-96dd-012d34b8bcd8",
+      "name": "Draft CSC Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxx",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output[0].content[0].text.Subject }}",
+        "message": "={{ $json.output[0].content[0].text.Message }}",
+        "options": {
+          "threadId": "={{ $('Text Classifier').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4064,
+        -704
+      ],
+      "id": "d09b810f-7784-4d7a-be99-cec669f3134f",
+      "name": "B&S Draft",
+      "webhookId": "62f59e39-9c24-421a-80ac-99b511254bf2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output[0].content[0].text.Subject }}",
+        "message": "={{ $json.output[0].content[0].text.Message }}",
+        "options": {
+          "threadId": "={{ $('Text Classifier').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4064,
+        -512
+      ],
+      "id": "9cab0ac1-020c-48eb-ac20-040fe065df43",
+      "name": "TS Draft",
+      "webhookId": "62f59e39-9c24-421a-80ac-99b511254bf2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output[0].content[0].text.Subject }}",
+        "message": "={{ $json.output[0].content[0].text.Message }}",
+        "options": {
+          "threadId": "={{ $('Text Classifier').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4064,
+        -320
+      ],
+      "id": "f2a395be-7bce-4ebc-bffe-f53dc494d7f4",
+      "name": "PUC Draft",
+      "webhookId": "62f59e39-9c24-421a-80ac-99b511254bf2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $('Gmail Trigger').item.json.headers.subject }}",
+        "message": "={{ $('Draft S&P Reply').item.json.output[0].content[0].text.Message }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4064,
+        -128
+      ],
+      "id": "b5b2d25e-043e-4ec1-8fdd-499a0748840f",
+      "name": "S&P Draft",
+      "webhookId": "62f59e39-9c24-421a-80ac-99b511254bf2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output[0].content[0].text.Subject }}",
+        "message": "={{ $json.output[0].content[0].text.Message }}",
+        "options": {
+          "threadId": "={{ $('Text Classifier').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4064,
+        64
+      ],
+      "id": "92384045-4628-476c-9daf-1478232a0c11",
+      "name": "CSC Draft",
+      "webhookId": "62f59e39-9c24-421a-80ac-99b511254bf2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fATlN54nUZ31dDOk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c24d9e66-61e9-4b10-99db-19e5744a6b1b",
+              "name": "Category",
+              "value": "={{ $('B&S category').item.json.Category }}",
+              "type": "string"
+            },
+            {
+              "id": "11cef13d-5c8e-464e-bd1a-face74772378",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "223a0988-5357-45c1-adac-5de57c5034a9",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5f12e1db-7682-4f7c-b88a-a9280b602dff",
+              "name": "output[0].content[0].text.Subject",
+              "value": "={{ $('Draft B&S Reply').item.json.output[0].content[0].text.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "9eacdd22-7898-43f1-91b4-4406cb2a72f0",
+              "name": "output[0].content[0].text.Message",
+              "value": "={{ $('Draft B&S Reply').item.json.output[0].content[0].text.Message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3840,
+        -704
+      ],
+      "id": "b36e877b-d89b-4ace-bfc5-d049c1e4cab0",
+      "name": "B&S"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c24d9e66-61e9-4b10-99db-19e5744a6b1b",
+              "name": "Category",
+              "value": "={{ $('TS category').item.json.Category }}",
+              "type": "string"
+            },
+            {
+              "id": "11cef13d-5c8e-464e-bd1a-face74772378",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "223a0988-5357-45c1-adac-5de57c5034a9",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5f12e1db-7682-4f7c-b88a-a9280b602dff",
+              "name": "output[0].content[0].text.Subject",
+              "value": "={{ $('Draft TS Reply').item.json.output[0].content[0].text.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "9eacdd22-7898-43f1-91b4-4406cb2a72f0",
+              "name": "output[0].content[0].text.Message",
+              "value": "={{ $('Draft TS Reply').item.json.output[0].content[0].text.Message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3840,
+        -512
+      ],
+      "id": "8d0645b4-fc3b-4039-a3bb-5ac736f904a4",
+      "name": "TS"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c24d9e66-61e9-4b10-99db-19e5744a6b1b",
+              "name": "Category",
+              "value": "={{ $('PUC category').item.json.Category }}",
+              "type": "string"
+            },
+            {
+              "id": "11cef13d-5c8e-464e-bd1a-face74772378",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "223a0988-5357-45c1-adac-5de57c5034a9",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5f12e1db-7682-4f7c-b88a-a9280b602dff",
+              "name": "output[0].content[0].text.Subject",
+              "value": "={{ $('Draft PUC Reply').item.json.output[0].content[0].text.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "9eacdd22-7898-43f1-91b4-4406cb2a72f0",
+              "name": "output[0].content[0].text.Message",
+              "value": "={{ $('Draft PUC Reply').item.json.output[0].content[0].text.Message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3840,
+        -320
+      ],
+      "id": "0fa54b5e-2c49-4b11-9bb5-a97ad390e790",
+      "name": "PUC"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c24d9e66-61e9-4b10-99db-19e5744a6b1b",
+              "name": "Category",
+              "value": "={{ $('S&P category').item.json.Category }}",
+              "type": "string"
+            },
+            {
+              "id": "11cef13d-5c8e-464e-bd1a-face74772378",
+              "name": "threadId",
+              "value": "={{ $('S&P category').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "223a0988-5357-45c1-adac-5de57c5034a9",
+              "name": "emailId",
+              "value": "={{ $('S&P category').item.json.emailId }}",
+              "type": "string"
+            },
+            {
+              "id": "5f12e1db-7682-4f7c-b88a-a9280b602dff",
+              "name": "output[0].content[0].text.Subject",
+              "value": "={{ $('Draft S&P Reply').item.json.output[0].content[0].text.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "9eacdd22-7898-43f1-91b4-4406cb2a72f0",
+              "name": "output[0].content[0].text.Message",
+              "value": "={{ $('Draft S&P Reply').item.json.output[0].content[0].text.Message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3840,
+        -128
+      ],
+      "id": "31c61449-21b2-4285-8fc8-f89c1e7a3456",
+      "name": "S&P"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c24d9e66-61e9-4b10-99db-19e5744a6b1b",
+              "name": "Category",
+              "value": "={{ $('CSC category').item.json.Category }}",
+              "type": "string"
+            },
+            {
+              "id": "11cef13d-5c8e-464e-bd1a-face74772378",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "223a0988-5357-45c1-adac-5de57c5034a9",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5f12e1db-7682-4f7c-b88a-a9280b602dff",
+              "name": "output[0].content[0].text.Subject",
+              "value": "={{ $('Draft CSC Reply').item.json.output[0].content[0].text.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "9eacdd22-7898-43f1-91b4-4406cb2a72f0",
+              "name": "output[0].content[0].text.Message",
+              "value": "={{ $('Draft CSC Reply').item.json.output[0].content[0].text.Message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3840,
+        64
+      ],
+      "id": "2ba4c6a2-8e1c-4e50-ad50-1ae2afffb3ce",
+      "name": "CSC"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1hNC0s23fPaF-zJs0AJ798iyD5jrnZ6gMimul1GXNI2c",
+          "mode": "list",
+          "cachedResultName": "Customer Support Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hNC0s23fPaF-zJs0AJ798iyD5jrnZ6gMimul1GXNI2c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hNC0s23fPaF-zJs0AJ798iyD5jrnZ6gMimul1GXNI2c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ID": "={{ $json.emailId }}",
+            "Category": "={{$json.Category}}",
+            "AI Subject": "={{ $json.output[0].content[0].text.Subject }}",
+            "AI Message": "={{ $json.output[0].content[0].text.Message }}"
+          },
+          "matchingColumns": [
+            "Email ID"
+          ],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Subject",
+              "displayName": "AI Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Message",
+              "displayName": "AI Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3392,
+        -320
+      ],
+      "id": "1a2dbb2a-5bdb-46d9-828c-7e5cef65c38f",
+      "name": "Database Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xxxxxx",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "B&S category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TS Category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PUC category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "S&P category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CSC category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    "Billing & Subscription": {
+      "main": [
+        [
+          {
+            "node": "Draft B&S Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product & Usage Questions": {
+      "main": [
+        [
+          {
+            "node": "Draft PUC Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales & Partnerships": {
+      "main": [
+        [
+          {
+            "node": "Draft S&P Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Complaints & Security Concerns": {
+      "main": [
+        [
+          {
+            "node": "Draft CSC Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Technical Support": {
+      "main": [
+        [
+          {
+            "node": "Draft TS Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Database Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSC category": {
+      "main": [
+        [
+          {
+            "node": "Complaints & Security Concerns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S&P category": {
+      "main": [
+        [
+          {
+            "node": "Sales & Partnerships",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PUC category": {
+      "main": [
+        [
+          {
+            "node": "Product & Usage Questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TS Category": {
+      "main": [
+        [
+          {
+            "node": "Technical Support",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B&S category": {
+      "main": [
+        [
+          {
+            "node": "Billing & Subscription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft B&S Reply": {
+      "main": [
+        [
+          {
+            "node": "B&S Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft TS Reply": {
+      "main": [
+        [
+          {
+            "node": "TS Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft PUC Reply": {
+      "main": [
+        [
+          {
+            "node": "PUC Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft S&P Reply": {
+      "main": [
+        [
+          {
+            "node": "S&P Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft CSC Reply": {
+      "main": [
+        [
+          {
+            "node": "CSC Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B&S Draft": {
+      "main": [
+        [
+          {
+            "node": "B&S",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TS Draft": {
+      "main": [
+        [
+          {
+            "node": "TS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PUC Draft": {
+      "main": [
+        [
+          {
+            "node": "PUC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S&P Draft": {
+      "main": [
+        [
+          {
+            "node": "S&P",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSC Draft": {
+      "main": [
+        [
+          {
+            "node": "CSC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B&S": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TS": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "PUC": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "S&P": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "CSC": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "ec44b6b2-46ed-43bd-b24f-3c259e5b4187",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6c41e44a058cec42ebae9f1df3fb07debb3c6dee5933caf97cb61d2f7346c6c4"
+  },
+  "id": "wJ5EUHO_f0H71cZZgiJJF",
+  "tags": []
+}
